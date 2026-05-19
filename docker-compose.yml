@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: notification-mysql
+    restart: always
+
+    ports:
+      - "3306:3306"
+
+    environment:
+      MYSQL_DATABASE: notification
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
+
+    networks:
+      - notification-network
+
+volumes:
+  mysql-data:
+
+networks:
+  notification-network:
