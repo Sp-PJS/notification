@@ -16,7 +16,12 @@ public enum ErrorCode {
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증 자격 증명이 유효하지 않습니다."),
 	COURSE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 강의입니다."),
 	ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "이미 수강신청(또는 완료)된 강의입니다."),
-	REGISTRATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 수강신청 내역입니다.");
+	REGISTRATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 수강신청 내역입니다."),
+
+	// 알림 에러코드
+	NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알림 요청 내역입니다."),
+	ALREADY_NOTIFIED(HttpStatus.CONFLICT, "이미 처리 중이거나 발송 완료된 알림입니다."),
+	NOTIFICATION_QUEUE_FULL(HttpStatus.SERVICE_UNAVAILABLE, "알림 대기열 처리 용량이 초과되거나 예상치 못한 에러가 발생했습니다.");
 
 	private final HttpStatus status;
 	private final String message;
