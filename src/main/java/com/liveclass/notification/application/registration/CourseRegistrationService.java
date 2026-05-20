@@ -1,5 +1,6 @@
 package com.liveclass.notification.application.registration;
 
+import com.liveclass.notification.application.notification.port.NotificationPublisherPort;
 import com.liveclass.notification.application.registration.dto.CourseRegistrationRequest;
 import com.liveclass.notification.application.registration.port.CourseRegistrationRepositoryPort;
 import com.liveclass.notification.domain.course.Course;
@@ -22,7 +23,9 @@ import java.util.UUID;
 public class CourseRegistrationService {
 
 	private final CourseRegistrationRepositoryPort registrationRepositoryPort;
+	private final NotificationPublisherPort notificationPublisherPort;
 
+	// 수강신청
 	@Transactional
 	public UUID registerCourse(UUID authenticatedUserId, CourseRegistrationRequest request) {
 
@@ -51,10 +54,17 @@ public class CourseRegistrationService {
 			.build();
 
 		// TODO: 알림 이벤트 발행 위치
+		// 수강신청 완료 알림 이벤트 발행
+		notificationPublisherPort.publish(new CourseRegistrationEvent(
+			user.getId(),
+			course.getId(),
+			RegistrationStatus.COMPLETED
+		));
 
 		return registrationRepositoryPort.save(registration).getId();
 	}
 
+	// 수강신청 취소
 	@Transactional
 	public UUID cancelCourseRegistration(UUID authenticatedUserId, UUID registrationId) {
 
@@ -67,13 +77,19 @@ public class CourseRegistrationService {
 			throw new BusinessException(ErrorCode.UNAUTHORIZED);
 		}
 
-		// 3. 도메인 객체 상태 변경 (COMPLETED -> CANCELED)
+		// 도메인 객체 상태 변경 (COMPLETED -> CANCELED)
 		registration.cancel();
 
-		// 4. 변경된 상태 DB에 반영 후, 저장된 엔티티의 ID를 반환
+
 		CourseRegistration savedRegistration = registrationRepositoryPort.save(registration);
 
 		// TODO: 알림 이벤트 발행 위치
+		// 수강신청 취소 완료 이벤트 발행
+		notificationPublisherPort.publish(new CourseRegistrationEvent(
+			savedRegistration.getUser().getId(),
+			savedRegistration.getCourse().getId(),
+			RegistrationStatus.CANCELED
+		));
 
 		return savedRegistration.getId();
 	}
